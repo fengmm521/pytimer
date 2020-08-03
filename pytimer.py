@@ -2,16 +2,18 @@
 # -*- coding: utf-8 -*-
 import threading  
 import time
-from Queue import Queue  
+from queue import Queue  
 
 class _timerThread(threading.Thread):  
-    def __init__(self, t_name,queue,cond):  
+    def __init__(self, t_name,queue,cond,timePrecision):  
         threading.Thread.__init__(self, name=t_name) 
         self.threadtimes = []
         self.threadFunc = {}
         self.lasttimes = {}
         self.isOnceRuns = []
+        self.threadFuncRun = {}
         self.queue = queue
+        self.timePrecision = timePrecision
     def setNewTimer(self,newobj):
         if newobj.func == None:
             self.threadtimes.remove(newobj.secendtime)
@@ -36,6 +38,7 @@ class _timerThread(threading.Thread):
                     self.isOnceRuns.append(newobj.secendtime)
     def run(self):
         while(True):
+            time.sleep(self.timePrecision)
             if not self.queue.empty():
                 objtmp = self.queue.get()
                 self.setNewTimer(objtmp)
@@ -64,10 +67,11 @@ class _timerObj():
         self.isOnce = isOnce
 
 class pytimer():
-    def __init__(self):
+    #timePrecision为时间精度，时间精度越高越占CPU时间，默认为100毫秒精度
+    def __init__(self,timePrecision = 0.1):
         self.queue = Queue()   
         self.cond = threading.Condition()
-        self.t_thread = _timerThread(str(int(time.time())),self.queue, self.cond) 
+        self.t_thread = _timerThread(str(int(time.time())),self.queue, self.cond,timePrecision) 
         self._timers = []
         self._initTimer()
     def _initTimer(self):
@@ -84,3 +88,15 @@ class pytimer():
         self._timers.remove(secendTime)
         self.queue.put(objtmp)
     
+
+
+def main():  
+    def timerCallBack(timex):
+        print(timex)
+    timerx = pytimer()
+    timerx.setTimer(2, timerCallBack)
+    while(True):
+        time.sleep(1)
+        pass
+if __name__ == '__main__':  
+    main()

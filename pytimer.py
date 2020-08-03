@@ -16,12 +16,19 @@ class _timerThread(threading.Thread):
         self.timePrecision = timePrecision
     def setNewTimer(self,newobj):
         if newobj.func == None:
-            self.threadtimes.remove(newobj.secendtime)
-            self.threadFunc[str(newobj.secendtime)] = None
-            self.lasttimes[str(newobj.secendtime)] = None
-            self.threadFuncRun[str(newobj.secendtime)] = None
-            if newobj.secendtime in self.isOnceRuns:
-                self.isOnceRuns.remove(newobj.secendtime)
+            if newobj.secendtime < 0:
+                self.threadtimes = []
+                self.threadFunc = {}
+                self.lasttimes = {}
+                self.isOnceRuns = []
+                self.threadFuncRun = {}
+            else:
+                self.threadtimes.remove(newobj.secendtime)
+                self.threadFunc[str(newobj.secendtime)] = None
+                self.lasttimes[str(newobj.secendtime)] = None
+                self.threadFuncRun[str(newobj.secendtime)] = None
+                if newobj.secendtime in self.isOnceRuns:
+                    self.isOnceRuns.remove(newobj.secendtime)
         else:
             if newobj.secendtime in self.threadtimes:
                 self.threadFunc[str(newobj.secendtime)] = newobj.func
@@ -86,6 +93,10 @@ class pytimer():
     def removeTimer(self,secendTime):
         objtmp = _timerObj(secendTime,None)
         self._timers.remove(secendTime)
+        self.queue.put(objtmp)
+    def removeAllTimer(self,secendTime):
+        objtmp = _timerObj(-1,None)
+        self._timers.remove(-1)
         self.queue.put(objtmp)
     
 

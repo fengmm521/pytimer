@@ -1,2 +1,3 @@
 # pytimer
-http://fengmm521.blog.163.com/blog/static/25091358201510173740790/
+
+一个使用python多线程实现的定时运行函数,现在修改的只支持python3了,因为python2和python3的Queue有点不一相,如果要在python2下使用要改一下Queue的库名称
